@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Store Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            position: fixed;
+            height: 100vh;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+            text-align: center;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-name {
+            font-size: 14px;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: #34495e;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Main content styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 30px;
+            padding: 8px 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+        
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 5px;
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-bell {
+            position: relative;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logout-btn {
+            padding: 8px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Dashboard cards */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .stat-trend-up {
+            color: #2ecc71;
+            margin-right: 5px;
+        }
+        
+        .stat-trend-down {
+            color: #e74c3c;
+            margin-right: 5px;
+        }
+        
+        /* Book sections */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .view-all {
+            color: #3498db;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .book-card {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .book-cover {
+            height: 220px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            overflow: hidden;
+        }
+        
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .book-info {
+            padding: 15px;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .book-author {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .book-rating {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #f39c12;
+        }
+        
+        .book-price {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        /* Reading Activity Section */
+        .activity-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .reading-progress {
+            display: flex;
+            margin-top: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .book-thumbnail {
+            width: 60px;
+            height: 90px;
+            background-color: #ddd;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .progress-info {
+            flex: 1;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+        }
+        
+        /* Footer */
+        .dashboard-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar-header h2, .user-name, .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .menu-item {
+                justify-content: center;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+            }
+            
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Book Store</h2>
+                <div class="user-info">
+                    <div class="user-avatar">U</div>
+                    <div class="user-name">User Name</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-book"></i>
+                    <span>My Books</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Shop</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-heart"></i>
+                    <span>Wishlist</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Reading History</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Book Clubs</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search for books, authors, genres...">
+                </div>
+                <div class="user-controls">
+                    <div class="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-count">3</div>
+                    </div>
+                    <button class="logout-btn">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Statistics -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-title">Books Read</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-footer">
+                        <span class="stat-trend-up"><i class="fas fa-arrow-up"></i> 20%</span>
+                        <span>from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Currently Reading</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-footer">
+                        <span class="stat-trend-up"><i class="fas fa-arrow-up"></i> 5%</span>
+                        <span>from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Reading Hours</div>
+                    <div class="stat-value">48.5</div>
+                    <div class="stat-footer">
+                        <span class="stat-trend-down"><i class="fas fa-arrow-down"></i> 10%</span>
+                        <span>from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Total Books</div>
+                    <div class="stat-value">37</div>
+                    <div class="stat-footer">
+                        <span class="stat-trend-up"><i class="fas fa-arrow-up"></i> 15%</span>
+                        <span>from last month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Currently Reading Section -->
+            <div class="section-header">
+                <h2 class="section-title">Currently Reading</h2>
+                <div class="view-all">View All</div>
+            </div>
+            
+            <div class="activity-card">
+                <div class="reading-progress">
+                    <div class="book-thumbnail"></div>
+                    <div class="progress-info">
+                        <h3>The Adventure Begins</h3>
+                        <p>by John Author</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 65%"></div>
+                        </div>
+                        <div class="progress-text">65% completed • 2 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="reading-progress">
+                    <div class="book-thumbnail"></div>
+                    <div class="progress-info">
+                        <h3>Mystery of the Lost Pages</h3>
+                        <p>by Sarah Writer</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 32%"></div>
+                        </div>
+                        <div class="progress-text">32% completed • Yesterday</div>
+                    </div>
+                </div>
+                
+                <div class="reading-progress">
+                    <div class="book-thumbnail"></div>
+                    <div class="progress-info">
+                        <h3>The Science of Everything</h3>
+                        <p>by Dr. Brilliant</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 10%"></div>
+                        </div>
+                        <div class="progress-text">10% completed • 3 days ago</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommended Books Section -->
+            <div class="section-header">
+                <h2 class="section-title">Recommended For You</h2>
+                <div class="view-all">View All</div>
+            </div>
+            
+            <div class="books-grid">
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">The Art of Reading</div>
+                        <div class="book-author">By Emma Scholar</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>4.5</span>
+                        </div>
+                        <div class="book-price">$12.99</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Digital Revolution</div>
+                        <div class="book-author">By Tech Visionary</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.0</span>
+                        </div>
+                        <div class="book-price">$15.49</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Cooking Masterclass</div>
+                        <div class="book-author">By Chef Elite</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>5.0</span>
+                        </div>
+                        <div class="book-price">$19.99</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Financial Freedom</div>
+                        <div class="book-author">By Money Guru</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <i class="far fa-star"></i>
+                            <span>3.5</span>
+                        </div>
+                        <div class="book-price">$14.99</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Popular Books Section -->
+            <div class="section-header">
+                <h2 class="section-title">Popular This Week</h2>
+                <div class="view-all">View All</div>
+            </div>
+            
+            <div class="books-grid">
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">The Hidden Truth</div>
+                        <div class="book-author">By Mystery Writer</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>5.0</span>
+                        </div>
+                        <div class="book-price">$13.99</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Science of Tomorrow</div>
+                        <div class="book-author">By Future Thinker</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.0</span>
+                        </div>
+                        <div class="book-price">$22.50</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Mindful Living</div>
+                        <div class="book-author">By Zen Master</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>4.5</span>
+                        </div>
+                        <div class="book-price">$11.99</div>
+                    </div>
+                </div>
+                
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img src="/api/placeholder/180/220" alt="Book Cover">
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">Travel Diaries</div>
+                        <div class="book-author">By World Explorer</div>
+                        <div class="book-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.0</span>
+                        </div>
+                        <div class="book-price">$16.75</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-footer">
+                © 2025 Book Store. All rights reserved.
+            </div>
+        </main>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAL8miQIUOcNr8eXiAn-nzk8PryWtlzsOg",
+            authDomain: "project401-5edfe.firebaseapp.com",
+            projectId: "project401-5edfe",
+            storageBucket: "project401-5edfe.appspot.com",
+            messagingSenderId: "586276062146",
+            appId: "1:586276062146:web:64a83638566f23e4858c5b"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Handle logout
+        document.getElementById("logout-btn").addEventListener("click", function() {
+            signOut(auth).then(() => {
+                alert("Logged Out!");
+                window.location.href = "login.html";
+            }).catch((error) => {
+                alert("Error: " + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
